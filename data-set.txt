@@ -1,0 +1,28 @@
+<metin->
+Atatürk sadece bir komutan değil aynı zamanda bir fikir adamıydı. Atatürk’ün başarısının altında yatan temel sebep de fikir adamlığından ileri gelmektedir. Şimdi kılıçlarımızı değil, kalemlerimizi keskinleştirmenin vakti derken
+savaşın sadece topla tüfekle değil; fikirle, düşünceyle, okumak ve yazmakla, ilim ve kültürle kazanılabildiğini tüm dünyaya ispatlamıştır.
+
+<soru-1>
+Parçaya göre Atatürk’ün başarısının altında yatan temel sebep nedir?
+<cevap-1>
+Atatürk’ün başarısının altında yatan temel sebep de fikir adamlığından ileri gelmektedir.
+
+<soru-2>
+Atatürk tüm dünyaya neyi ispatlamıştır?
+<cevap-2>
+Şimdi kılıçlarımızı değil, kalemlerimizi keskinleştirmenin vakti derken savaşın sadece topla tüfekle değil; fikirle, düşünceyle, okumak ve yazmakla, ilim ve
+kültürle kazanılabildiğini tüm dünyaya ispatlamıştır.
+
+<metin->
+Şeker insanların en çok tükettiği ve vazgeçilmez besinlerden bir tanesi. Meyve ve sebzelerde bulunan doğal şekere zihinsel faaliyetlerimizi yürütmemiz ve olumlu bir ruh hali için ihtiyacımız var. Bunun yanında aşırı şeker tüketmenin ve işlem görmüş kimyasal şekerin de insan vücuduna birçok zararı var. İşlenmiş şeker; kalbe zarar verir, obeziteye yol açar, bağışıklık sistemini zayıflatır, vücudun mineral dengesini bozar, diş çürümelerini ve yaşlanmayı hızlandırır. Bu sebeplerle şekeri doğal yollarla almalı, vücudumuza kimyasal şekeri aşırı miktarda yüklememeye dikkat etmeliyiz.
+
+<soru-3>
+Parçaya göre insan vücudunun neden doğal şekere ihtiyacı vardır?
+<cevap-3>
+Meyve ve sebzelerde bulunan doğal şekere zihinsel faaliyetlerimizi yürütmemiz ve olumlu bir ruh hali için ihtiyacımız var.
+
+<soru-4>
+Parçaya göre “işlenmiş şekerin” insan vücuduna zararı nelerdir?
+<cevap-4>
+İşlenmiş şeker; kalbe zarar verir, obeziteye yol açar, bağışıklık sistemini zayıflatır, vücudun mineral dengesini bozar, diş çürümelerini ve yaşlanmayı
+hızlandırır.
