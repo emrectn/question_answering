@@ -2,11 +2,16 @@ from html.parser import HTMLParser
 from difflib import SequenceMatcher
 from enum import Enum
 from pprint import pprint
+from ngram import NGram
 import json
 import string
 
 
 WORD_SIZE = 6
+# Gordugu karakterleri digeriyle degistiriyor
+TO_LOWER = str.maketrans('ABCÇDEFGĞHIIJKLMNOÖPQRSŞTUÜVWXYZ',
+                         'abcçdefgğhıijklmnoöpqrsştuüvwxyz',
+                         '’“”')
 
 
 # Bir cümle icersindeki noktalama işaretlerini kaldıran fonksiyon
@@ -46,11 +51,8 @@ def success_rate(data):
 
 
 # Turkce karakterler icin ozel lower fonksiyonu
-def tr_lower(str):
-    rep = [('İ', 'i'),  ('I', 'ı')]
-    for search, replace in rep:
-        str = str.replace(search, replace)
-        return str.lower()
+def tr_lower(s):
+    return s.translate(TO_LOWER)
 
 
 # metni cumlelere gore ayirma fonksiyonu
@@ -72,18 +74,23 @@ def find_answer_index(text, question, mode):
 
     if mode == 0:
         for text_sentence in text:
-            common_word_numbers.append(calc_common_word(text_sentence, question))
+            common_word_numbers.append(calc_common_word(
+                                        text_sentence, question))
 
     elif mode == 1:
         for text_sentence in text:
-            common_word_numbers.append(calc_common_word_sixch(text_sentence, question))
+            common_word_numbers.append(calc_common_word_sixch(
+                                        text_sentence, question))
 
+    elif mode == 2:
+        for text sentence in text:
+            common_word_numbers.append(calc_common_word_ngram(
+                                        text_sentence, question))
     else:
         print('Mode hatasi')
 
     #    print(common_word_numbers)
-    index = common_word_numbers.index(max(common_word_numbers))
-
+    index = int(common_word_numbers.index(max(common_word_numbers)))
     return index
 
 
@@ -123,11 +130,17 @@ def calc_common_word_sixch(text_sentence, question):
     return common
 
 
+# ngram kullanarak ortak kelime sayisinin hesaplanmasi
+def calc_common_word_ngram(text_sentence, question):
+
+    return common
+
 def edit_length_word(word_list, word_length):
     # İlk WORD_SIZE harfin alinmasi
     for i, sentence_word in enumerate(word_list):
         if len(sentence_word) > WORD_SIZE:
             word_list[i] = word_list[i][0:word_length]
+            # print(word_list[i])
     return word_list
 
 
@@ -195,8 +208,11 @@ if __name__ == '__main__':
             question_list = data_content['sorular']
             for question in question_list:
                 answer_index = find_answer_index(text_sentences, question['soru'], i)
-                if answer_index:
+
+                if isinstance(answer_index, int):
                     question['bulunan_cevap'] = text_sentences[answer_index]
+                else:
+                    print('İndex Bulunamadi')
 
                 if is_answer_true(question['cevap'], question['bulunan_cevap']):
                     question['status'] = True
