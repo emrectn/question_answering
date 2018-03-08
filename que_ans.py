@@ -3,8 +3,20 @@ from difflib import SequenceMatcher
 from enum import Enum
 from pprint import pprint
 import json
+import string
 
 
+WORD_SIZE = 6
+
+
+# Bir cümle icersindeki noktalama işaretlerini kaldıran fonksiyon
+def remove_punctuation(sentence):
+    exclude = set(string.punctuation)
+    sentence = ''.join(ch for ch in sentence if ch not in exclude)
+    return sentence
+
+
+# iki cümle karsilastirilarak cümlelerin esit olup olmadıgı kontrol edilir.
 def is_answer_true(answer, finding_answer):
     answer = answer.replace('.', '').strip()
     answer = tr_lower(answer)
@@ -19,6 +31,7 @@ def is_answer_true(answer, finding_answer):
         return False
 
 
+# Dogru_cümle_sayisi/Toplam_cümle_sayisi oranını hesaplar
 def success_rate(data):
     total = 0
     successful = 0
@@ -57,15 +70,20 @@ def find_answer_index(text, question, mode):
     # cevap cumlesinin, kontrol icin diz
     common_word_numbers = []
 
-    for text_sentence in text:
-        if mode == 0:
+    if mode == 0:
+        for text_sentence in text:
             common_word_numbers.append(calc_common_word(text_sentence, question))
-        elif mode == 1:
+
+    elif mode == 1:
+        for text_sentence in text:
             common_word_numbers.append(calc_common_word_sixch(text_sentence, question))
-        else:
-            print('Mode hatasi')
+
+    else:
+        print('Mode hatasi')
+
     #    print(common_word_numbers)
     index = common_word_numbers.index(max(common_word_numbers))
+
     return index
 
 
@@ -86,13 +104,38 @@ def calc_common_word(text_sentence, question):
 def calc_common_word_sixch(text_sentence, question):
     common = 0
 
+    # Noktalama isaretlerinden temizlendi
+    text_sentence = remove_punctuation(text_sentence)
+    question = remove_punctuation(question)
+
+    # Kucuk harf ve kelime kelime parcalama islemi
+    text_sentence = tr_lower(text_sentence).strip().split()
+    question = tr_lower(question).strip().split()
+
+    # ilk 6 harfin alınması
+    text_sentence = edit_length_word(text_sentence, WORD_SIZE)
+    question = edit_length_word(question, WORD_SIZE)
+
+    # Ortak kelime karsilastrilmasi
+    for question_word in question:
+        if question_word in text_sentence:
+            common += 1
+    return common
+
+
+def edit_length_word(word_list, word_length):
+    # İlk WORD_SIZE harfin alinmasi
+    for i, sentence_word in enumerate(word_list):
+        if len(sentence_word) > WORD_SIZE:
+            word_list[i] = word_list[i][0:word_length]
+    return word_list
+
 
 class DataStatus(Enum):
     TEXT = 0
     QUESTION = 1
     ANSWER = 2
     EMPTY = -1
-
 
 
 class MyHTMLParser(HTMLParser):
@@ -119,7 +162,7 @@ class MyHTMLParser(HTMLParser):
         # print("start tag:", tag.strip())
 
     def handle_data(self, data):
-        # metinin baÅŸÄ±ndaki ve sonunda '\n'den kurtuluyoruz.
+        # metinin basindaki ve sonunda '\n'den kurtuluyoruz.
         # data_content = data.strip()
         # re.sub('\n', '', data_content)
         data_content = data.replace('\n', ' ').strip()
@@ -132,7 +175,6 @@ class MyHTMLParser(HTMLParser):
             self.data[-1]['sorular'][-1]['bulunan_cevap'] = ''
             self.data[-1]['sorular'][-1]['status'] = ''
 
-    # metni cumlelere gore ayirma fonksiyonu        self.data[-1]['sorular'][-1]['status'] = ''
 
 if __name__ == '__main__':
     with open('data-set.txt') as f:
@@ -146,15 +188,24 @@ if __name__ == '__main__':
 
     data = parser.data
 
-    for data_content in data:
-        text_sentences = sentence_parser(data_content)
-        question_list = data_content['sorular']
-        for question in question_list:
-            answer_index = find_answer_index(text_sentences, question['soru'],0)
-            question['bulunan_cevap'] = text_sentences[answer_index]
-            if is_answer_true(question['cevap'], question['bulunan_cevap']):
-                question['status'] = True
-            else:
-                question['status'] = False
+    # İki yöntem icin for dongusu donmektedir.
+    for i in range(2):
+        for data_content in data:
+            text_sentences = sentence_parser(data_content)
+            question_list = data_content['sorular']
+            for question in question_list:
+                answer_index = find_answer_index(text_sentences, question['soru'], i)
+                if answer_index:
+                    question['bulunan_cevap'] = text_sentences[answer_index]
 
-    print('Basari ORani : {}'.format(success_rate(data)))
+                if is_answer_true(question['cevap'], question['bulunan_cevap']):
+                    question['status'] = True
+                else:
+                    question['status'] = False
+
+                # print('Cevap : ', question['cevap'])
+                # print('MY : ', question['bulunan_cevap'])
+                # print('Sonuc : ', question['status'])
+                # print()
+
+        print('Basari Orani-{} : {}'.format(i, success_rate(data)))
