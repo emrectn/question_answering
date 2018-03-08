@@ -1,23 +1,44 @@
 from html.parser import HTMLParser
+from difflib import SequenceMatcher
 from enum import Enum
 from pprint import pprint
 import json
 
 
-# def find_similarty_sentence(text_list, question):
-#     equal_word_number = []
-#     counter = 0
+def is_answer_true(answer, finding_answer):
+    answer = answer.replace('.', '').strip()
+    answer = tr_lower(answer)
 
-#     question = question.replace()
-#     question = question.split()
-#     for question_word in question
+    finding_answer = finding_answer.replace('.', '').strip()
+    finding_answer = tr_lower(finding_answer)
+
+    ratio = SequenceMatcher(None, answer, finding_answer).ratio()
+    if ratio == 1.0:
+        return True
+    else:
+        return False
 
 
+def success_rate(data):
+    total = 0
+    successful = 0
+
+    for data_content in data:
+        for question in data_content['sorular']:
+            if question['status']:
+                successful += 1
+            total += 1
+
+    return (successful/total)*100
+
+
+# Turkce karakterler icin ozel lower fonksiyonu
 def tr_lower(str):
     rep = [('İ', 'i'),  ('I', 'ı')]
     for search, replace in rep:
         str = str.replace(search, replace)
         return str.lower()
+
 
 # metni cumlelere gore ayirma fonksiyonu
 def sentence_parser(data_content):
@@ -32,15 +53,20 @@ def sentence_parser(data_content):
     return data_text
 
 
-def find_answer(text, question):
-    #cevap cumlesinin, kontrol icin diz
+def find_answer_index(text, question, mode):
+    # cevap cumlesinin, kontrol icin diz
     common_word_numbers = []
 
     for text_sentence in text:
-        common_word_numbers.append(calc_common_word(text_sentence, question))
+        if mode == 0:
+            common_word_numbers.append(calc_common_word(text_sentence, question))
+        elif mode == 1:
+            common_word_numbers.append(calc_common_word_sixch(text_sentence, question))
+        else:
+            print('Mode hatasi')
     #    print(common_word_numbers)
     index = common_word_numbers.index(max(common_word_numbers))
-    return text[index]
+    return index
 
 
 # ortak kelime sayisini bulur
@@ -57,11 +83,16 @@ def calc_common_word(text_sentence, question):
     return common
 
 
+def calc_common_word_sixch(text_sentence, question):
+    common = 0
+
+
 class DataStatus(Enum):
     TEXT = 0
     QUESTION = 1
     ANSWER = 2
     EMPTY = -1
+
 
 
 class MyHTMLParser(HTMLParser):
@@ -83,7 +114,7 @@ class MyHTMLParser(HTMLParser):
             self.data_status = DataStatus.ANSWER
 
         else:
-            print('Metin parcalanirken hata oluÅŸtu')
+            print('Metin parcalanirken hata oluştu')
 
         # print("start tag:", tag.strip())
 
@@ -99,6 +130,7 @@ class MyHTMLParser(HTMLParser):
         elif self.data_status == DataStatus.ANSWER:
             self.data[-1]['sorular'][-1]['cevap'] = data_content
             self.data[-1]['sorular'][-1]['bulunan_cevap'] = ''
+            self.data[-1]['sorular'][-1]['status'] = ''
 
     # metni cumlelere gore ayirma fonksiyonu        self.data[-1]['sorular'][-1]['status'] = ''
 
@@ -118,8 +150,11 @@ if __name__ == '__main__':
         text_sentences = sentence_parser(data_content)
         question_list = data_content['sorular']
         for question in question_list:
-            question['bulunan_cevap'] = find_answer(text_sentences, question['soru'])
-            print('soru:', question['soru'])
-            print('dogru:', question['cevap'])
-            print('cevap:', question['bulunan_cevap'])
-            input('')
+            answer_index = find_answer_index(text_sentences, question['soru'],0)
+            question['bulunan_cevap'] = text_sentences[answer_index]
+            if is_answer_true(question['cevap'], question['bulunan_cevap']):
+                question['status'] = True
+            else:
+                question['status'] = False
+
+    print('Basari ORani : {}'.format(success_rate(data)))
