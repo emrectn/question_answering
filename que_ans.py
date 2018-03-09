@@ -8,6 +8,7 @@ import string
 
 
 WORD_SIZE = 6
+N_GRAM = 3
 # Gordugu karakterleri digeriyle degistiriyor
 TO_LOWER = str.maketrans('ABCÇDEFGĞHIIJKLMNOÖPQRSŞTUÜVWXYZ',
                          'abcçdefgğhıijklmnoöpqrsştuüvwxyz',
@@ -83,7 +84,7 @@ def find_answer_index(text, question, mode):
                                         text_sentence, question))
 
     elif mode == 2:
-        for text sentence in text:
+        for text_sentence in text:
             common_word_numbers.append(calc_common_word_ngram(
                                         text_sentence, question))
     else:
@@ -132,8 +133,32 @@ def calc_common_word_sixch(text_sentence, question):
 
 # ngram kullanarak ortak kelime sayisinin hesaplanmasi
 def calc_common_word_ngram(text_sentence, question):
+    common = 0
+
+    # Noktalama isaretlerinden temizlendi
+    text_sentence = remove_punctuation(text_sentence)
+    question = remove_punctuation(question)
+
+    # Kucuk harf ve kelime kelime parcalama islemi
+    text_sentence = tr_lower(text_sentence).strip()
+    question = tr_lower(question).strip()
+
+    n = NGram(N=N_GRAM)
+    list_text_sentence = list(n.split(text_sentence))
+    list_question = list(n.split(question))
+
+    # print(list_text_sentence)
+    # print()
+    # print(list_question)
+    # input('')
+
+    for question_word in list_question:
+        if question_word in list_text_sentence:
+            # print(question_word)
+            common += 1
 
     return common
+
 
 def edit_length_word(word_list, word_length):
     # İlk WORD_SIZE harfin alinmasi
@@ -202,7 +227,7 @@ if __name__ == '__main__':
     data = parser.data
 
     # İki yöntem icin for dongusu donmektedir.
-    for i in range(2):
+    for i in range(3):
         for data_content in data:
             text_sentences = sentence_parser(data_content)
             question_list = data_content['sorular']
@@ -223,5 +248,9 @@ if __name__ == '__main__':
                 # print('MY : ', question['bulunan_cevap'])
                 # print('Sonuc : ', question['status'])
                 # print()
+
+        # pprint(parser.data)
+        with open('data' + str(i) + '.json', 'w') as f:
+            json.dump(parser.data, f, indent=4)
 
         print('Basari Orani-{} : {}'.format(i, success_rate(data)))
