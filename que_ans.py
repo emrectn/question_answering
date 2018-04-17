@@ -3,16 +3,39 @@ from difflib import SequenceMatcher
 from enum import Enum
 from pprint import pprint
 from ngram import NGram
+from pyfasttext import FastText
+import os
+import re
+import math
 import json
 import string
 
 
-WORD_SIZE = 6
 N_GRAM = 3
+WORD_SIZE = 6
+VECTOR_NUM = 300
 # Gordugu karakterleri digeriyle degistiriyor
 TO_LOWER = str.maketrans('ABCÇDEFGĞHIIJKLMNOÖPQRSŞTUÜVWXYZ',
                          'abcçdefgğhıijklmnoöpqrsştuüvwxyz',
                          '’“”')
+
+
+# Kosinüs benzerliği hesaplanır.
+def cosine_similarity(v1, v2):
+    "compute cosine similarity of v1 to v2: (v1 dot v2)/{||v1||*||v2||)"
+    sumxx, sumxy, sumyy = 0, 0, 0
+
+    if len(v1) != len(v2):
+        print('Vektörler aynı uzayda değil')
+        return None
+
+    for i in range(len(v1)):
+        x = v1[i]
+        y = v2[i]
+        sumxx += x*x
+        sumyy += y*y
+        sumxy += x*y
+    return sumxy/math.sqrt(sumxx*sumyy)
 
 
 # Bir cümle icersindeki noktalama işaretlerini kaldıran fonksiyon
@@ -66,6 +89,9 @@ def sentence_parser(data_content):
     for i, sentence in enumerate(data_text):
         data_text[i] = sentence.strip()
 
+    # Bosluk varsa kaldırılıyor.
+    if '' in data_text:
+        data_text.remove('')
     return data_text
 
 
@@ -231,26 +257,51 @@ if __name__ == '__main__':
         for data_content in data:
             text_sentences = sentence_parser(data_content)
             question_list = data_content['sorular']
+
             for question in question_list:
-                answer_index = find_answer_index(text_sentences, question['soru'], i)
+                    answer_index = find_answer_index(text_sentences, question['soru'], i)
 
-                if isinstance(answer_index, int):
-                    question['bulunan_cevap'] = text_sentences[answer_index]
-                else:
-                    print('İndex Bulunamadi')
+                    if isinstance(answer_index, int):
+                        question['bulunan_cevap'] = text_sentences[answer_index]
+                    else:
+                        print('İndex Bulunamadi')
 
-                if is_answer_true(question['cevap'], question['bulunan_cevap']):
-                    question['status'] = True
-                else:
-                    question['status'] = False
+                    if is_answer_true(question['cevap'], question['bulunan_cevap']):
+                        question['status'] = True
+                    else:
+                        question['status'] = False
 
-                # print('Cevap : ', question['cevap'])
-                # print('MY : ', question['bulunan_cevap'])
-                # print('Sonuc : ', question['status'])
-                # print()
+                    # print('Cevap : ', question['cevap'])
+                    # print('MY : ', question['bulunan_cevap'])
+                    # print('Sonuc : ', question['status'])
+                    # print()
+
 
         # pprint(parser.data)
         with open('data' + str(i) + '.json', 'w') as f:
             json.dump(parser.data, f, indent=4)
+        if i == 0:
+            print('Kelime kelime karşılaştırma')
+        elif i == 1:
+            print('İlk 6 harf karşılaştırma')
+        else:
+            print('Ngram bazlı karşılaştırma')
+        print(' Basari Orani-{} : {}\n'.format(i, success_rate(data)))
 
-        print('Basari Orani-{} : {}'.format(i, success_rate(data)))
+
+# -----------------------------------------------------------------
+
+    for data_content in data:
+        print(data_content)
+        input('')
+        text_sentence = sentence_parser(data_content)
+        print(text_sentence)
+        input('')
+
+        question_list = data_content['sorular']
+        print(question_list)
+        input('')
+
+        for question in question_list:
+            print(question)
+            input('')
