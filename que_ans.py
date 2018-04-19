@@ -1,11 +1,8 @@
 from html.parser import HTMLParser
 from difflib import SequenceMatcher
 from enum import Enum
-from pprint import pprint
 from ngram import NGram
 from pyfasttext import FastText
-import os
-import re
 import math
 import json
 import string
@@ -14,10 +11,39 @@ import string
 N_GRAM = 3
 WORD_SIZE = 6
 VECTOR_NUM = 300
+MODEL_PATH = 'fastText/model.bin'
 # Gordugu karakterleri digeriyle degistiriyor
 TO_LOWER = str.maketrans('ABCÇDEFGĞHIIJKLMNOÖPQRSŞTUÜVWXYZ',
                          'abcçdefgğhıijklmnoöpqrsştuüvwxyz',
                          '’“”')
+
+
+# Model Dosyamız yükleniyor.
+print('Vektörlerimiz Yükleniyor... Lütfen Bekleyiniz...')
+model = FastText()
+model.load_model(MODEL_PATH)
+
+
+# def load_model():
+#     model = FastText()
+#     model.load_model(MODEL_PATH)
+#     return model
+
+
+# kelime vektorunden cumle vektorune
+def sent2Vec(sentence):
+    sentenceVector = [0.0]*VECTOR_NUM
+    split_sentence = sentence.split()
+    for word in split_sentence:
+        wordVector = model[word]
+        for i in range(VECTOR_NUM):
+            sentenceVector[i] += wordVector[i]
+
+    for i in range(len(sentenceVector)):
+        sentenceVector[i] = sentenceVector[i]/300
+
+    # print(sentenceVector)
+    return sentenceVector
 
 
 # Kosinüs benzerliği hesaplanır.
@@ -35,6 +61,9 @@ def cosine_similarity(v1, v2):
         sumxx += x*x
         sumyy += y*y
         sumxy += x*y
+
+    if sumxx == 0 or sumyy == 0:
+        return 0
     return sumxy/math.sqrt(sumxx*sumyy)
 
 
@@ -113,6 +142,16 @@ def find_answer_index(text, question, mode):
         for text_sentence in text:
             common_word_numbers.append(calc_common_word_ngram(
                                         text_sentence, question))
+
+    elif mode == 3:
+        for text_sentence in text:
+            print(text_sentence)
+            print(question)
+            input('')
+            common_word_numbers.append(cosine_similarity(
+                                        sent2Vec(text_sentence),
+                                        sent2Vec(question)))
+
     else:
         print('Mode hatasi')
 
@@ -252,14 +291,20 @@ if __name__ == '__main__':
 
     data = parser.data
 
+    # Model Dosyamız yükleniyor.
+    # model = FastText()
+    # model.load_model(MODEL_PATH)
+
     # İki yöntem icin for dongusu donmektedir.
-    for i in range(3):
+    for i in range(4):
         for data_content in data:
             text_sentences = sentence_parser(data_content)
             question_list = data_content['sorular']
 
             for question in question_list:
-                    answer_index = find_answer_index(text_sentences, question['soru'], i)
+                    answer_index = find_answer_index(
+                                                text_sentences,
+                                                question['soru'], i)
 
                     if isinstance(answer_index, int):
                         question['bulunan_cevap'] = text_sentences[answer_index]
@@ -277,31 +322,33 @@ if __name__ == '__main__':
                     # print()
 
 
-        # pprint(parser.data)
+# pprint(parser.data)
         with open('data' + str(i) + '.json', 'w') as f:
             json.dump(parser.data, f, indent=4)
         if i == 0:
             print('Kelime kelime karşılaştırma')
         elif i == 1:
             print('İlk 6 harf karşılaştırma')
-        else:
+        elif i == 2:
             print('Ngram bazlı karşılaştırma')
+        elif i == 3:
+            print('FastText kullanarak karşılaştırma')
         print(' Basari Orani-{} : {}\n'.format(i, success_rate(data)))
 
 
 # -----------------------------------------------------------------
 
-    for data_content in data:
-        print(data_content)
-        input('')
-        text_sentence = sentence_parser(data_content)
-        print(text_sentence)
-        input('')
+    # for data_content in data:
+    #     print(data_content)
+    #     input('')
+    #     text_sentence = sentence_parser(data_content)
+    #     print(text_sentence)
+    #     input('')
 
-        question_list = data_content['sorular']
-        print(question_list)
-        input('')
+    #     question_list = data_content['sorular']
+    #     print(question_list)
+    #     input('')
 
-        for question in question_list:
-            print(question)
-            input('')
+    #     for question in question_list:
+    #         print(question)
+    #         input('')

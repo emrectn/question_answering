@@ -1,0 +1,24 @@
+TO DO LIST
+    1-
+        bir cümlenin vektörünü bul
+        sorunun vektörünü bul
+        En yakın vektörler cevabımızdır.
+HATIRLATMALAR
+
+DATA_CONTENT
+    {'metin': 'Hayatta türlü kayıplara uğramamızın en büyük sebeplerinden biri zamana karşı kayıtsızlığımızdır. Oysa her işte erken davranmak, başarıya giden yolda ilerlemek kadar önemlidir. Vaktinde harekete geçmek, başarı yolunda atılan ilk adımdır aynı zamanda. Bir işi başarmaya istekli ve azimli olan insanların adımları da seri olmalıdır.', 'sorular': [{'bulunan_cevap': 'Bir işi başarmaya istekli ve azimli olan insanların adımları da seri olmalıdır', 'status': False, 'cevap': 'Vaktinde harekete geçmek, başarı yolunda atılan ilk adımdır aynı zamanda.', 'soru': 'Başarılı olmada ilkadım nedir?'}]}
+
+
+TEXT_SENTENCE
+    ['Hayatta türlü kayıplara uğramamızın en büyük sebeplerinden biri zamana karşı kayıtsızlığımızdır', 'Oysa her işte erken davranmak, başarıya giden yolda ilerlemek kadar önemlidir', 'Vaktinde harekete geçmek, başarı yolunda atılan ilk adımdır aynı zamanda', 'Bir işi başarmaya istekli ve azimli olan insanların adımları da seri olmalıdır']
+
+QUESTİON_LİST
+    [{'soru': 'Başarılı olmada ilkadım nedir?', 'bulunan_cevap': 'Bir işi başarmaya istekli ve azimli olan insanların adımları da seri olmalıdır', 'cevap': 'Vaktinde harekete geçmek, başarı yolunda atılan ilk adımdır aynı zamanda.', 'status': False}]
+
+QUESTİON
+    {'soru': 'Başarılı olmada ilkadım nedir?', 'bulunan_cevap': 'Bir işi başarmaya istekli ve azimli olan insanların adımları da seri olmalıdır', 'cevap': 'Vaktinde harekete geçmek, başarı yolunda atılan ilk adımdır aynı zamanda.', 'status': False}
+
+
+!! BUNLARIN SİLİNMESİ GEREK
+    ‘’
+    ’’
