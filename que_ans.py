@@ -10,7 +10,7 @@ import string
 
 N_GRAM = 3
 WORD_SIZE = 6
-VECTOR_NUM = 300
+VECTOR_NUM = 100
 MODEL_PATH = 'fastText/model.bin'
 # Gordugu karakterleri digeriyle degistiriyor
 TO_LOWER = str.maketrans('ABCÇDEFGĞHIIJKLMNOÖPQRSŞTUÜVWXYZ',
@@ -145,9 +145,6 @@ def find_answer_index(text, question, mode):
 
     elif mode == 3:
         for text_sentence in text:
-            print(text_sentence)
-            print(question)
-            input('')
             common_word_numbers.append(cosine_similarity(
                                         sent2Vec(text_sentence),
                                         sent2Vec(question)))

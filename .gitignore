@@ -1,2 +1,7 @@
 *.json
 fastText
+*.bin
+*.vec
+*.pdf
+todolist
+TO DO LIST
