@@ -10,8 +10,8 @@ import string
 
 N_GRAM = 3
 WORD_SIZE = 6
-VECTOR_NUM = 100
-MODEL_PATH = 'fastText/model.bin'
+VECTOR_NUM = 300
+MODEL_PATH = 'model.bin'
 # Gordugu karakterleri digeriyle degistiriyor
 TO_LOWER = str.maketrans('ABCÇDEFGĞHIIJKLMNOÖPQRSŞTUÜVWXYZ',
                          'abcçdefgğhıijklmnoöpqrsştuüvwxyz',
@@ -39,8 +39,8 @@ def sent2Vec(sentence):
         for i in range(VECTOR_NUM):
             sentenceVector[i] += wordVector[i]
 
-    for i in range(len(sentenceVector)):
-        sentenceVector[i] = sentenceVector[i]/300
+    for i in range(VECTOR_NUM):
+        sentenceVector[i] = sentenceVector[i]/len(sentenceVector)
 
     # print(sentenceVector)
     return sentenceVector
@@ -304,14 +304,23 @@ if __name__ == '__main__':
                                                 question['soru'], i)
 
                     if isinstance(answer_index, int):
+                        # print('Metin:\n', text_sentences, '\n')
+                        # print('Soru:\n', question['soru'], '\n')
+                        # print('Doğru Cevap:\n', question['cevap'], '\n')
+                        # print('Bulunan Cevap:\n', text_sentences[answer_index], '\n')
                         question['bulunan_cevap'] = text_sentences[answer_index]
                     else:
                         print('İndex Bulunamadi')
 
                     if is_answer_true(question['cevap'], question['bulunan_cevap']):
                         question['status'] = True
+                        # print('Durum : ', question['status'])
+                        # input('')
                     else:
                         question['status'] = False
+                        # print('Durum : ', question['status'])
+                        # input('')
+
 
                     # print('Cevap : ', question['cevap'])
                     # print('MY : ', question['bulunan_cevap'])
@@ -320,8 +329,8 @@ if __name__ == '__main__':
 
 
 # pprint(parser.data)
-        with open('data' + str(i) + '.json', 'w') as f:
-            json.dump(parser.data, f, indent=4)
+        with open('data' + str(i) + '.json', 'w', encoding='utf8') as f:
+            json.dump(parser.data, f, indent=4, ensure_ascii=False)
         if i == 0:
             print('Kelime kelime karşılaştırma')
         elif i == 1:
